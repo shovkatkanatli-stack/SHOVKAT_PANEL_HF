@@ -2,7 +2,7 @@
 title: Luffy Panel
 emoji: 🏴‍☠️
 colorFrom: yellow
-colorTo: black
+colorTo: gray
 sdk: docker
 pinned: false
 license: mit
