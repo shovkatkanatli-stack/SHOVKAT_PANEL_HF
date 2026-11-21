@@ -1,5 +1,5 @@
 ---
-title: Luffy Panel
+title: Shovkat Panel
 emoji: 🏴‍☠️
 colorFrom: yellow
 colorTo: gray
@@ -9,7 +9,7 @@ license: mit
 app_port: 7860
 ---
 
-# 🏴‍☠️ Luffy Panel — Hugging Face Edition
+# 🏴‍☠️ Shovkat Panel — Hugging Face Edition
 
 VLESS Proxy Gateway Management Panel — now running on Hugging Face Spaces.
 
@@ -47,8 +47,8 @@ Set these in your Space Settings → Repository secrets.
 2. Choose **Docker** as the Space SDK
 3. Upload these files or connect your GitHub repo
 4. Set `ADMIN_PASSWORD` secret (optional)
-5. Your panel will be live at `https://{username}-luffy-panel.hf.space`
+5. Your panel will be live at `https://{username}-shovkat-panel.hf.space`
 
 ## Credits
 
-Originally built for Render/Railway. Adapted for Hugging Face Spaces by استاد ترید.
+Originally built for Render/Railway. Adapted for Hugging Face Spaces by Shovkat Kanatli.
