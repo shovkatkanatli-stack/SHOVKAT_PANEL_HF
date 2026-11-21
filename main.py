@@ -18,9 +18,9 @@ import logging
 import psutil
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("Luffy-Gateway")
+logger = logging.getLogger("Shovkat-Gateway")
 
-app = FastAPI(title="Luffy Panel", docs_url=None, redoc_url=None)
+app = FastAPI(title="Shovkat Panel", docs_url=None, redoc_url=None)
 
 # Hugging Face Spaces default port
 HF_PORT = int(os.environ.get("PORT", 7860))
@@ -137,7 +137,7 @@ def generate_uuid(seed: str | None = None) -> str:
     h = hashlib.sha256(f"{seed}{CONFIG['secret']}".encode()).hexdigest()
     return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:32]}"
 
-def generate_vless_link(uuid: str, remark: str = "Luffy", address: str = None) -> str:
+def generate_vless_link(uuid: str, remark: str = "Shovkat", address: str = None) -> str:
     domain = get_domain()
     addr = address if address else domain
     path = f"/ws/{uuid}"
@@ -231,7 +231,7 @@ async def close_connections_for_link(uid: str):
 # ── Routes ────────────────────────────────────────────────────────────────────
 @app.get("/")
 async def root():
-    return {"service": "Luffy Panel", "version": "1.0", "status": "active", "domain": get_domain()}
+    return {"service": "Shovkat Panel", "version": "1.0", "status": "active", "domain": get_domain()}
 
 @app.get("/health")
 async def health():
@@ -339,7 +339,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
     return {
         "uuid": uid, "label": label, "limit_bytes": limit_bytes, "used_bytes": 0,
         "max_connections": max_conn, "active": True, "created_at": LINKS[uid]["created_at"],
-        "expires_at": expires_at, "vless_link": generate_vless_link(uid, remark=f"Luffy-{label}"),
+        "expires_at": expires_at, "vless_link": generate_vless_link(uid, remark=f"Shovkat-{label}"),
     }
 
 @app.get("/api/links")
@@ -358,7 +358,7 @@ async def list_links(_=Depends(require_auth)):
             "created_at": data["created_at"],
             "expires_at": data.get("expires_at"),
             "current_connections": await count_connections_for_link(uid),  # FIX: await
-            "vless_link": generate_vless_link(uid, remark=f"Luffy-{data['label']}"),
+            "vless_link": generate_vless_link(uid, remark=f"Shovkat-{data['label']}"),
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
@@ -436,14 +436,14 @@ async def get_subscription(uid: str, _=Depends(require_auth)):
         if link is None:
             raise HTTPException(status_code=404, detail="link not found")
         link = dict(link)
-    vless_link = generate_vless_link(uid, remark=f"Luffy-{link['label']}")
+    vless_link = generate_vless_link(uid, remark=f"Shovkat-{link['label']}")
     used = link["used_bytes"]
     limit = link["limit_bytes"]
     used_mb = round(used / (1024 * 1024), 2)
     limit_mb = round(limit / (1024 * 1024), 2) if limit > 0 else 0
     pct = round((used / limit) * 100, 1) if limit > 0 else 0
     remaining_mb = round((limit - used) / (1024 * 1024), 2) if limit > 0 else 0
-    sub_content = f"# Luffy Panel\n{vless_link}"
+    sub_content = f"# Shovkat Panel\n{vless_link}"
     encoded = base64.b64encode(sub_content.encode()).decode()
     return {
         "subscription_url": f"{get_domain()}/api/links/{uid}/sub",
@@ -472,9 +472,9 @@ def generate_subscription_content(link: dict, uid: str, addresses: list[str]) ->
     else:
         expiry_str = f"{secs_left // 86400} Days Left"
     status_node = generate_vless_link(uid, remark=f"📊 {usage_str} | ⏳ {expiry_str}", address="0.0.0.0")
-    links_out = [status_node, generate_vless_link(uid, remark=f"Luffy-{link['label']}-Server")]
+    links_out = [status_node, generate_vless_link(uid, remark=f"Shovkat-{link['label']}-Server")]
     for i, addr in enumerate(addresses):
-        links_out.append(generate_vless_link(uid, remark=f"Luffy-{link['label']}-IP{i+1}", address=addr))
+        links_out.append(generate_vless_link(uid, remark=f"Shovkat-{link['label']}-IP{i+1}", address=addr))
     return "\n".join(links_out)
 
 @app.get("/sub/{uid}")
@@ -748,7 +748,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title data-en="Luffy Panel" data-fa="LUFFY PANEL">Luffy Panel</title>
+<title data-en="Shovkat Panel" data-fa="SHOVKAT PANEL">Shovkat Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@300;400;500;600;700&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -963,7 +963,7 @@ body[dir="rtl"]{direction:rtl;text-align:right}
           <ellipse cx="42" cy="17" rx="23" ry="5.5" fill="#C8900A" stroke="#FFD700" stroke-width="1"/>
           <path d="M20 45 Q21.5 41.5 42 39.5 Q62.5 41.5 64 45" fill="none" stroke="#CC2200" stroke-width="4.5" stroke-linecap="round" opacity=".92"/>
         </svg>
-        <div class="login-title">LUFFY PANEL</div>
+        <div class="login-title">SHOVKAT PANEL</div>
         <div class="login-sub">Enter your password to continue</div>
       </div>
       <div class="fg">
@@ -988,7 +988,7 @@ body[dir="rtl"]{direction:rtl;text-align:right}
         <button class="lang-btn lang-fa" onclick="setLang('fa')">FA</button>
       </div>
     </div>
-    <span style="font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1px;">LUFFY</span>
+    <span style="font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1px;">SHOVKAT</span>
   </div>
 
   <!-- SIDEBAR / BOTTOM NAV -->
@@ -1004,7 +1004,7 @@ body[dir="rtl"]{direction:rtl;text-align:right}
           <ellipse cx="35" cy="24" rx="5" ry="3" fill="rgba(255,255,255,.1)" transform="rotate(-20 35 24)"/>
         </svg>
       </div>
-      <div class="sb-title">LUFFY</div>
+      <div class="sb-title">SHOVKAT</div>
     </div>
     <nav class="sb-nav">
       <button class="nav-item active" data-page="dashboard">
@@ -1589,7 +1589,7 @@ function showQR(txt){
 function dlQR(){
   const a=document.createElement('a');
   a.href=$m('qr-img').src;
-  a.download='luffy-qr.png';
+  a.download='shovkat-qr.png';
   a.click();
 }
 
